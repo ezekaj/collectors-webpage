@@ -258,7 +258,7 @@ function ItemDetailContent() {
                   <p className="text-[10px] uppercase text-white/30">
                     {locale === "de" ? "Preis" : "Price"}
                   </p>
-                  <PriceTag priceCents={mockItem.price} currency={mockItem.currency} size="xl" />
+                  <PriceTag priceCents={mockItem.price} currency={mockItem.currency} size="lg" />
                 </div>
                 <div className="flex items-center gap-1 text-xs text-green-400">
                   <TrendingUp className="h-3 w-3" />
