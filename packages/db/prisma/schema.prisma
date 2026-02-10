@@ -1,0 +1,1251 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Locale {
+  de
+  en
+}
+
+enum Currency {
+  EUR
+  USD
+}
+
+enum RarityRating {
+  COMMON
+  UNCOMMON
+  RARE
+  VERY_RARE
+  ULTRA_RARE
+  LEGENDARY
+}
+
+enum ImageType {
+  OFFICIAL
+  USER
+  GRADING
+}
+
+enum PriceSource {
+  PLATFORM
+  EBAY
+  COMMUNITY
+}
+
+enum PriceSubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum GradingCarType {
+  LOOSE
+  CARDED
+  BOXED
+}
+
+enum GradingSessionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum GradingImageAngle {
+  TOP
+  LEFT
+  RIGHT
+  BOTTOM
+  CARD_FRONT
+  CARD_BACK
+}
+
+enum GradingReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum GradingFeedbackType {
+  AGREE
+  DISAGREE
+  ADJUST
+}
+
+enum ListingType {
+  SALE
+  TRADE
+  AUCTION
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  SOLD
+  EXPIRED
+  CANCELLED
+}
+
+enum ItemCondition {
+  MINT
+  NEAR_MINT
+  EXCELLENT
+  VERY_GOOD
+  GOOD
+  FAIR
+  POOR
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COUNTERED
+  EXPIRED
+  WITHDRAWN
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAYMENT_HELD
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  DISPUTED
+  REFUNDED
+  CANCELLED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_BUYER
+  RESOLVED_SELLER
+  MUTUALLY_RESOLVED
+  ESCALATED
+}
+
+enum AuctionType {
+  CURATED
+  SELLER
+}
+
+enum AuctionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PostType {
+  WANTED
+  SHOWCASE
+  DISCUSSION
+}
+
+enum EventType {
+  VIRTUAL_MEETUP
+  SWAP_MEET
+  CONTEST
+  RELEASE_DAY
+}
+
+enum EventParticipantStatus {
+  REGISTERED
+  ATTENDED
+  CANCELLED
+}
+
+enum FraudSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ---------------------------------------------------------------------------
+// 1. User
+// ---------------------------------------------------------------------------
+
+model User {
+  id                String    @id @default(cuid())
+  clerkId           String    @unique
+  username          String    @unique
+  displayName       String
+  avatarUrl         String?
+  bio               String?
+  preferredLocale   Locale    @default(de)
+  preferredCurrency Currency  @default(EUR)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  collections              Collection[]
+  communityPriceSubmissions CommunityPriceSubmission[]
+  gradingSessions          GradingSession[]
+  gradingFeedbacks         GradingFeedback[]
+  listings                 Listing[]
+  buyerOffers              Offer[]          @relation("BuyerOffers")
+  buyerOrders              Order[]          @relation("BuyerOrders")
+  sellerOrders             Order[]          @relation("SellerOrders")
+  disputesOpened           Dispute[]        @relation("DisputeOpener")
+  reviewsWritten           Review[]         @relation("Reviewer")
+  reviewsReceived          Review[]         @relation("Reviewee")
+  curatedAuctions          Auction[]        @relation("AuctionCurator")
+  currentBids              AuctionLot[]     @relation("CurrentBidder")
+  bids                     Bid[]
+  autoBidConfigs           AutoBidConfig[]
+  catalogueProgress        CatalogueProgress[]
+  articles                 Article[]
+  spotlights               CollectorSpotlight[]
+  posts                    Post[]
+  comments                 Comment[]
+  followers                Follow[]         @relation("Following")
+  following                Follow[]         @relation("Follower")
+  eventsCreated            Event[]
+  eventParticipations      EventParticipant[]
+  activities               Activity[]
+  notifications            Notification[]
+  badges                   UserBadge[]
+  xp                       UserXP?
+  xpTransactions           XPTransaction[]
+  fraudSignals             FraudSignal[]    @relation("FraudUser")
+  verifiedPriceSubmissions CommunityPriceSubmission[] @relation("PriceVerifier")
+  gradingReviews           GradingResult[]  @relation("GradingReviewer")
+  resolvedFraudSignals     FraudSignal[]    @relation("FraudResolver")
+
+  @@index([clerkId])
+  @@index([username])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 2. Category
+// ---------------------------------------------------------------------------
+
+model Category {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  name            String
+  description     String?
+  iconUrl         String?
+  attributeSchema Json
+  gradingCriteria Json
+  accentColor     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  series   Series[]
+  items    Item[]
+  articles Article[]
+  posts    Post[]
+
+  @@index([slug])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 3. Series
+// ---------------------------------------------------------------------------
+
+model Series {
+  id          String    @id @default(cuid())
+  categoryId  String
+  name        String
+  year        Int?
+  description String?
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  category       Category        @relation(fields: [categoryId], references: [id])
+  itemSeries     ItemSeries[]
+  cataloguePages CataloguePage[]
+
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 4. Item
+// ---------------------------------------------------------------------------
+
+model Item {
+  id                 String       @id @default(cuid())
+  categoryId         String
+  name               String
+  description        String?
+  year               Int?
+  manufacturer       String?
+  modelNumber        String?
+  barcode            String?
+  attributes         Json         @default("{}")
+  rarityRating       RarityRating
+  estimatedValueCents Int?
+  currency           Currency     @default(EUR)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  deletedAt          DateTime?
+
+  category                  Category                   @relation(fields: [categoryId], references: [id])
+  variants                  ItemVariant[]
+  images                    ItemImage[]
+  itemSeries                ItemSeries[]
+  collectionItems           CollectionItem[]
+  priceRecords              PriceRecord[]
+  communityPriceSubmissions CommunityPriceSubmission[]
+  gradingSessions           GradingSession[]
+  listings                  Listing[]
+  catalogueSlots            CatalogueSlot[]
+
+  @@index([categoryId])
+  @@index([rarityRating])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 5. ItemVariant
+// ---------------------------------------------------------------------------
+
+model ItemVariant {
+  id                String    @id @default(cuid())
+  itemId            String
+  variantName       String
+  variantAttributes Json
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  item            Item             @relation(fields: [itemId], references: [id])
+  images          ItemImage[]
+  collectionItems CollectionItem[]
+  priceRecords    PriceRecord[]
+  listings        Listing[]
+
+  @@index([itemId])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 6. ItemImage
+// ---------------------------------------------------------------------------
+
+model ItemImage {
+  id        String    @id @default(cuid())
+  itemId    String
+  variantId String?
+  url       String
+  type      ImageType
+  blurhash  String?
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  item    Item         @relation(fields: [itemId], references: [id])
+  variant ItemVariant? @relation(fields: [variantId], references: [id])
+
+  @@index([itemId])
+  @@index([variantId])
+  @@index([itemId, sortOrder])
+}
+
+// ---------------------------------------------------------------------------
+// 7. ItemSeries
+// ---------------------------------------------------------------------------
+
+model ItemSeries {
+  itemId   String
+  seriesId String
+
+  item   Item   @relation(fields: [itemId], references: [id])
+  series Series @relation(fields: [seriesId], references: [id])
+
+  @@id([itemId, seriesId])
+  @@unique([itemId, seriesId])
+  @@index([seriesId])
+}
+
+// ---------------------------------------------------------------------------
+// 8. Collection
+// ---------------------------------------------------------------------------
+
+model Collection {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String    @default("My Collection")
+  description String?
+  isPublic    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  user  User             @relation(fields: [userId], references: [id])
+  items CollectionItem[]
+
+  @@index([userId])
+  @@index([isPublic])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 9. CollectionItem
+// ---------------------------------------------------------------------------
+
+model CollectionItem {
+  id                String         @id @default(cuid())
+  collectionId      String
+  itemId            String
+  variantId         String?
+  quantity          Int            @default(1)
+  condition         ItemCondition?
+  purchasePriceCents Int?
+  purchaseCurrency  Currency?
+  purchaseDate      DateTime?
+  notes             String?
+  isWishlist        Boolean        @default(false)
+  gradingResultId   String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+
+  collection    Collection     @relation(fields: [collectionId], references: [id])
+  item          Item           @relation(fields: [itemId], references: [id])
+  variant       ItemVariant?   @relation(fields: [variantId], references: [id])
+  gradingResult GradingResult? @relation(fields: [gradingResultId], references: [id])
+
+  @@unique([collectionId, itemId, variantId])
+  @@index([collectionId])
+  @@index([itemId])
+  @@index([variantId])
+  @@index([isWishlist])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 10. PriceRecord
+// ---------------------------------------------------------------------------
+
+model PriceRecord {
+  id         String       @id @default(cuid())
+  itemId     String
+  variantId  String?
+  priceCents Int
+  currency   Currency
+  source     PriceSource
+  condition  ItemCondition?
+  recordedAt DateTime
+  createdAt  DateTime     @default(now())
+
+  item    Item         @relation(fields: [itemId], references: [id])
+  variant ItemVariant? @relation(fields: [variantId], references: [id])
+
+  @@index([itemId])
+  @@index([variantId])
+  @@index([itemId, recordedAt])
+  @@index([source])
+}
+
+// ---------------------------------------------------------------------------
+// 11. CommunityPriceSubmission
+// ---------------------------------------------------------------------------
+
+model CommunityPriceSubmission {
+  id           String                @id @default(cuid())
+  userId       String
+  itemId       String
+  priceCents   Int
+  currency     Currency
+  condition    ItemCondition?
+  priceSource  String
+  notes        String?
+  status       PriceSubmissionStatus @default(PENDING)
+  verifiedAt   DateTime?
+  verifiedById String?
+  createdAt    DateTime              @default(now())
+
+  user       User  @relation(fields: [userId], references: [id])
+  item       Item  @relation(fields: [itemId], references: [id])
+  verifiedBy User? @relation("PriceVerifier", fields: [verifiedById], references: [id])
+
+  @@index([userId])
+  @@index([itemId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// 12. GradingSession
+// ---------------------------------------------------------------------------
+
+model GradingSession {
+  id        String               @id @default(cuid())
+  userId    String
+  itemId    String?
+  carType   GradingCarType
+  status    GradingSessionStatus @default(PENDING)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  user   User           @relation(fields: [userId], references: [id])
+  item   Item?          @relation(fields: [itemId], references: [id])
+  images GradingImage[]
+  result GradingResult?
+
+  @@index([userId])
+  @@index([itemId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// 13. GradingImage
+// ---------------------------------------------------------------------------
+
+model GradingImage {
+  id           String            @id @default(cuid())
+  sessionId    String
+  imageUrl     String
+  angle        GradingImageAngle
+  qualityScore Json?
+  createdAt    DateTime          @default(now())
+
+  session GradingSession @relation(fields: [sessionId], references: [id])
+
+  @@index([sessionId])
+}
+
+// ---------------------------------------------------------------------------
+// 14. GradingResult
+// ---------------------------------------------------------------------------
+
+model GradingResult {
+  id                   String              @id @default(cuid())
+  sessionId            String              @unique
+  carBodyGrade         Decimal
+  carBodyLetter        String
+  packagingGrade       Decimal?
+  packagingLetter      String?
+  confidence           Float
+  defects              Json
+  modelVersion         String
+  processingTimeMs     Int
+  needsManualReview    Boolean             @default(false)
+  reviewStatus         GradingReviewStatus?
+  reviewerId           String?
+  reviewerGradeOverride Json?
+  createdAt            DateTime            @default(now())
+
+  session         GradingSession    @relation(fields: [sessionId], references: [id])
+  reviewer        User?             @relation("GradingReviewer", fields: [reviewerId], references: [id])
+  feedbacks       GradingFeedback[]
+  collectionItems CollectionItem[]
+
+  @@index([sessionId])
+  @@index([reviewStatus])
+}
+
+// ---------------------------------------------------------------------------
+// 15. GradingFeedback
+// ---------------------------------------------------------------------------
+
+model GradingFeedback {
+  id             String              @id @default(cuid())
+  resultId       String
+  userId         String
+  feedbackType   GradingFeedbackType
+  suggestedGrade Decimal?
+  comment        String?
+  createdAt      DateTime            @default(now())
+
+  result GradingResult @relation(fields: [resultId], references: [id])
+  user   User          @relation(fields: [userId], references: [id])
+
+  @@index([resultId])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// 16. Listing
+// ---------------------------------------------------------------------------
+
+model Listing {
+  id              String        @id @default(cuid())
+  sellerId        String
+  itemId          String
+  variantId       String?
+  type            ListingType
+  status          ListingStatus @default(DRAFT)
+  priceCents      Int
+  currency        Currency
+  condition       ItemCondition
+  description     String?
+  shipsFrom       String
+  shipsTo         Json
+  shippingOptions Json
+  expiresAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+
+  seller      User         @relation(fields: [sellerId], references: [id])
+  item        Item         @relation(fields: [itemId], references: [id])
+  variant     ItemVariant? @relation(fields: [variantId], references: [id])
+  offers       Offer[]
+  orders       Order[]
+  auctionLots  AuctionLot[]
+  fraudSignals FraudSignal[]
+
+  @@index([sellerId])
+  @@index([itemId])
+  @@index([variantId])
+  @@index([status])
+  @@index([type, status])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 17. Offer
+// ---------------------------------------------------------------------------
+
+model Offer {
+  id            String      @id @default(cuid())
+  listingId     String
+  buyerId       String
+  amountCents   Int
+  currency      Currency
+  status        OfferStatus @default(PENDING)
+  parentOfferId String?
+  message       String?
+  expiresAt     DateTime
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  listing     Listing @relation(fields: [listingId], references: [id])
+  buyer       User    @relation("BuyerOffers", fields: [buyerId], references: [id])
+  parentOffer Offer?  @relation("OfferChain", fields: [parentOfferId], references: [id])
+  childOffers Offer[] @relation("OfferChain")
+  orders      Order[]
+
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([status])
+  @@index([parentOfferId])
+}
+
+// ---------------------------------------------------------------------------
+// 18. Order
+// ---------------------------------------------------------------------------
+
+model Order {
+  id                    String      @id @default(cuid())
+  orderNumber           String      @unique
+  buyerId               String
+  sellerId              String
+  listingId             String
+  offerId               String?
+  status                OrderStatus @default(PENDING_PAYMENT)
+  itemPriceCents        Int
+  shippingCents         Int
+  platformFeeCents      Int
+  currency              Currency
+  stripePaymentIntentId String?
+  escrowReleaseAt       DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  buyer    User      @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller   User      @relation("SellerOrders", fields: [sellerId], references: [id])
+  listing  Listing   @relation(fields: [listingId], references: [id])
+  offer    Offer?    @relation(fields: [offerId], references: [id])
+  shipment Shipment?
+  disputes Dispute[]
+  reviews  Review[]
+  fraudSignals FraudSignal[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([listingId])
+  @@index([offerId])
+  @@index([status])
+  @@index([orderNumber])
+}
+
+// ---------------------------------------------------------------------------
+// 19. Shipment
+// ---------------------------------------------------------------------------
+
+model Shipment {
+  id             String    @id @default(cuid())
+  orderId        String    @unique
+  carrier        String
+  trackingNumber String?
+  labelUrl       String?
+  trackingEvents Json      @default("[]")
+  fromCountry    String
+  toCountry      String
+  shippedAt      DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([trackingNumber])
+}
+
+// ---------------------------------------------------------------------------
+// 20. Dispute
+// ---------------------------------------------------------------------------
+
+model Dispute {
+  id          String        @id @default(cuid())
+  orderId     String
+  openedById  String
+  reason      String
+  description String
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  order    Order @relation(fields: [orderId], references: [id])
+  openedBy User  @relation("DisputeOpener", fields: [openedById], references: [id])
+
+  @@index([orderId])
+  @@index([openedById])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// 21. Review
+// ---------------------------------------------------------------------------
+
+model Review {
+  id         String    @id @default(cuid())
+  orderId    String
+  reviewerId String
+  revieweeId String
+  rating     Int
+  comment    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  order    Order @relation(fields: [orderId], references: [id])
+  reviewer User  @relation("Reviewer", fields: [reviewerId], references: [id])
+  reviewee User  @relation("Reviewee", fields: [revieweeId], references: [id])
+
+  @@index([orderId])
+  @@index([reviewerId])
+  @@index([revieweeId])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 22. Auction
+// ---------------------------------------------------------------------------
+
+model Auction {
+  id            String        @id @default(cuid())
+  type          AuctionType
+  status        AuctionStatus @default(SCHEDULED)
+  title         String
+  description   String?
+  coverImageUrl String?
+  startTime     DateTime
+  endTime       DateTime
+  curatorId     String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  curator User?        @relation("AuctionCurator", fields: [curatorId], references: [id])
+  lots    AuctionLot[]
+
+  @@index([status])
+  @@index([curatorId])
+  @@index([startTime, endTime])
+}
+
+// ---------------------------------------------------------------------------
+// 23. AuctionLot
+// ---------------------------------------------------------------------------
+
+model AuctionLot {
+  id                String  @id @default(cuid())
+  auctionId         String
+  listingId         String
+  lotNumber         Int
+  startingPriceCents Int
+  reservePriceCents Int?
+  currentBidCents   Int     @default(0)
+  currentBidderId   String?
+  bidCount          Int     @default(0)
+  extendsOnBid      Boolean @default(true)
+  extensionSeconds  Int     @default(30)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  auction        Auction        @relation(fields: [auctionId], references: [id])
+  listing        Listing        @relation(fields: [listingId], references: [id])
+  currentBidder  User?          @relation("CurrentBidder", fields: [currentBidderId], references: [id])
+  bids           Bid[]
+  autoBidConfigs AutoBidConfig[]
+
+  @@index([auctionId])
+  @@index([listingId])
+  @@index([currentBidderId])
+}
+
+// ---------------------------------------------------------------------------
+// 24. Bid
+// ---------------------------------------------------------------------------
+
+model Bid {
+  id         String   @id @default(cuid())
+  lotId      String
+  bidderId   String
+  amountCents Int
+  currency   Currency
+  isAutoBid  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  lot    AuctionLot @relation(fields: [lotId], references: [id])
+  bidder User       @relation(fields: [bidderId], references: [id])
+
+  @@index([lotId])
+  @@index([bidderId])
+  @@index([lotId, amountCents])
+}
+
+// ---------------------------------------------------------------------------
+// 25. AutoBidConfig
+// ---------------------------------------------------------------------------
+
+model AutoBidConfig {
+  id             String   @id @default(cuid())
+  lotId          String
+  userId         String
+  maxAmountCents Int
+  incrementCents Int
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  lot  AuctionLot @relation(fields: [lotId], references: [id])
+  user User       @relation(fields: [userId], references: [id])
+
+  @@unique([lotId, userId])
+  @@index([lotId])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// 26. CataloguePage
+// ---------------------------------------------------------------------------
+
+model CataloguePage {
+  id              String   @id @default(cuid())
+  seriesId        String
+  year            Int?
+  pageNumber      Int
+  layout          Json
+  backgroundTheme String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  series Series          @relation(fields: [seriesId], references: [id])
+  slots  CatalogueSlot[]
+
+  @@index([seriesId])
+  @@index([seriesId, pageNumber])
+}
+
+// ---------------------------------------------------------------------------
+// 27. CatalogueSlot
+// ---------------------------------------------------------------------------
+
+model CatalogueSlot {
+  id          String   @id @default(cuid())
+  pageId      String
+  itemId      String
+  positionRow Int
+  positionCol Int
+  createdAt   DateTime @default(now())
+
+  page     CataloguePage       @relation(fields: [pageId], references: [id])
+  item     Item                @relation(fields: [itemId], references: [id])
+  progress CatalogueProgress[]
+
+  @@unique([pageId, itemId])
+  @@index([pageId])
+  @@index([itemId])
+}
+
+// ---------------------------------------------------------------------------
+// 28. CatalogueProgress
+// ---------------------------------------------------------------------------
+
+model CatalogueProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  slotId          String
+  collectedAt     DateTime @default(now())
+  animationPlayed Boolean  @default(false)
+
+  user User          @relation(fields: [userId], references: [id])
+  slot CatalogueSlot @relation(fields: [slotId], references: [id])
+
+  @@unique([userId, slotId])
+  @@index([userId])
+  @@index([slotId])
+}
+
+// ---------------------------------------------------------------------------
+// 29. Article
+// ---------------------------------------------------------------------------
+
+model Article {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  title         String
+  subtitle      String?
+  content       String        @db.Text
+  coverImageUrl String?
+  authorId      String
+  status        ArticleStatus @default(DRAFT)
+  locale        Locale
+  publishedAt   DateTime?
+  categoryId    String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  author     User                 @relation(fields: [authorId], references: [id])
+  category   Category?            @relation(fields: [categoryId], references: [id])
+  tags       ArticleTag[]
+  spotlights CollectorSpotlight[]
+  comments   Comment[]
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([status])
+  @@index([categoryId])
+  @@index([publishedAt])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 30. ArticleTag
+// ---------------------------------------------------------------------------
+
+model ArticleTag {
+  id        String @id @default(cuid())
+  articleId String
+  tag       String
+
+  article Article @relation(fields: [articleId], references: [id])
+
+  @@unique([articleId, tag])
+  @@index([articleId])
+  @@index([tag])
+}
+
+// ---------------------------------------------------------------------------
+// 31. CollectorSpotlight
+// ---------------------------------------------------------------------------
+
+model CollectorSpotlight {
+  id         String   @id @default(cuid())
+  userId     String
+  articleId  String
+  featuredAt DateTime
+  createdAt  DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  article Article @relation(fields: [articleId], references: [id])
+
+  @@index([userId])
+  @@index([articleId])
+  @@index([featuredAt])
+}
+
+// ---------------------------------------------------------------------------
+// 32. Post
+// ---------------------------------------------------------------------------
+
+model Post {
+  id         String    @id @default(cuid())
+  userId     String
+  type       PostType
+  title      String
+  content    String    @db.Text
+  categoryId String?
+  locale     Locale?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  user     User      @relation(fields: [userId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+  comments Comment[]
+
+  @@index([userId])
+  @@index([type])
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 33. Comment
+// ---------------------------------------------------------------------------
+
+model Comment {
+  id        String    @id @default(cuid())
+  userId    String
+  content   String    @db.Text
+  postId    String?
+  articleId String?
+  parentId  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user    User      @relation(fields: [userId], references: [id])
+  post    Post?     @relation(fields: [postId], references: [id])
+  article Article?  @relation(fields: [articleId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([userId])
+  @@index([postId])
+  @@index([articleId])
+  @@index([parentId])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 34. Follow
+// ---------------------------------------------------------------------------
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Follower", fields: [followerId], references: [id])
+  following User @relation("Following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// ---------------------------------------------------------------------------
+// 35. Event
+// ---------------------------------------------------------------------------
+
+model Event {
+  id              String    @id @default(cuid())
+  type            EventType
+  title           String
+  description     String?
+  coverImageUrl   String?
+  startTime       DateTime
+  endTime         DateTime?
+  maxParticipants Int?
+  createdById     String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  createdBy    User               @relation(fields: [createdById], references: [id])
+  participants EventParticipant[]
+
+  @@index([type])
+  @@index([createdById])
+  @@index([startTime])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// 36. EventParticipant
+// ---------------------------------------------------------------------------
+
+model EventParticipant {
+  id        String                 @id @default(cuid())
+  eventId   String
+  userId    String
+  status    EventParticipantStatus @default(REGISTERED)
+  createdAt DateTime               @default(now())
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// 37. Activity
+// ---------------------------------------------------------------------------
+
+model Activity {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+  @@index([userId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// 38. Notification
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  data      Json      @default("{}")
+  readAt    DateTime?
+  locale    Locale?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([userId, readAt])
+  @@index([type])
+}
+
+// ---------------------------------------------------------------------------
+// 39. BadgeDefinition
+// ---------------------------------------------------------------------------
+
+model BadgeDefinition {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  criteria    Json
+  iconUrl     String?
+  createdAt   DateTime @default(now())
+
+  userBadges UserBadge[]
+
+  @@index([slug])
+}
+
+// ---------------------------------------------------------------------------
+// 40. UserBadge
+// ---------------------------------------------------------------------------
+
+model UserBadge {
+  id         String   @id @default(cuid())
+  userId     String
+  badgeId    String
+  unlockedAt DateTime @default(now())
+
+  user  User            @relation(fields: [userId], references: [id])
+  badge BadgeDefinition @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+}
+
+// ---------------------------------------------------------------------------
+// 41. UserXP
+// ---------------------------------------------------------------------------
+
+model UserXP {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  totalXp       Int       @default(0)
+  level         Int       @default(1)
+  currentStreak Int       @default(0)
+  longestStreak Int       @default(0)
+  lastActiveAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([totalXp])
+  @@index([level])
+}
+
+// ---------------------------------------------------------------------------
+// 42. XPTransaction
+// ---------------------------------------------------------------------------
+
+model XPTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  reason    String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// 43. FraudSignal
+// ---------------------------------------------------------------------------
+
+model FraudSignal {
+  id           String        @id @default(cuid())
+  userId       String?
+  listingId    String?
+  orderId      String?
+  signalType   String
+  severity     FraudSeverity
+  metadata     Json          @default("{}")
+  resolvedAt   DateTime?
+  resolvedById String?
+  createdAt    DateTime      @default(now())
+
+  user       User?  @relation("FraudUser", fields: [userId], references: [id])
+  listing    Listing? @relation(fields: [listingId], references: [id])
+  order      Order? @relation(fields: [orderId], references: [id])
+  resolvedBy User?  @relation("FraudResolver", fields: [resolvedById], references: [id])
+
+  @@index([userId])
+  @@index([listingId])
+  @@index([orderId])
+  @@index([signalType])
+  @@index([severity])
+  @@index([resolvedAt])
+}
