@@ -4,6 +4,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
 import { routing } from "@/i18n/routing";
+import { TRPCProvider } from "@/lib/trpc/react";
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const hasClerkKey =
@@ -73,9 +74,11 @@ export default async function LocaleLayout({
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <AuthProvider>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
+          <TRPCProvider>
+            <NextIntlClientProvider messages={messages}>
+              {children}
+            </NextIntlClientProvider>
+          </TRPCProvider>
         </AuthProvider>
       </body>
     </html>

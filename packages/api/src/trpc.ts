@@ -1,4 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
+import { db } from "@sammelfieber/db";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -8,6 +9,7 @@ export interface CreateContextOptions {
 
 export function createTRPCContext(opts: CreateContextOptions) {
   return {
+    db,
     userId: opts.userId,
   };
 }

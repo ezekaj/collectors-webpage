@@ -197,39 +197,39 @@ model User {
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime?
 
-  collections              Collection[]
+  collections               Collection[]
   communityPriceSubmissions CommunityPriceSubmission[]
-  gradingSessions          GradingSession[]
-  gradingFeedbacks         GradingFeedback[]
-  listings                 Listing[]
-  buyerOffers              Offer[]          @relation("BuyerOffers")
-  buyerOrders              Order[]          @relation("BuyerOrders")
-  sellerOrders             Order[]          @relation("SellerOrders")
-  disputesOpened           Dispute[]        @relation("DisputeOpener")
-  reviewsWritten           Review[]         @relation("Reviewer")
-  reviewsReceived          Review[]         @relation("Reviewee")
-  curatedAuctions          Auction[]        @relation("AuctionCurator")
-  currentBids              AuctionLot[]     @relation("CurrentBidder")
-  bids                     Bid[]
-  autoBidConfigs           AutoBidConfig[]
-  catalogueProgress        CatalogueProgress[]
-  articles                 Article[]
-  spotlights               CollectorSpotlight[]
-  posts                    Post[]
-  comments                 Comment[]
-  followers                Follow[]         @relation("Following")
-  following                Follow[]         @relation("Follower")
-  eventsCreated            Event[]
-  eventParticipations      EventParticipant[]
-  activities               Activity[]
-  notifications            Notification[]
-  badges                   UserBadge[]
-  xp                       UserXP?
-  xpTransactions           XPTransaction[]
-  fraudSignals             FraudSignal[]    @relation("FraudUser")
-  verifiedPriceSubmissions CommunityPriceSubmission[] @relation("PriceVerifier")
-  gradingReviews           GradingResult[]  @relation("GradingReviewer")
-  resolvedFraudSignals     FraudSignal[]    @relation("FraudResolver")
+  gradingSessions           GradingSession[]
+  gradingFeedbacks          GradingFeedback[]
+  listings                  Listing[]
+  buyerOffers               Offer[]                    @relation("BuyerOffers")
+  buyerOrders               Order[]                    @relation("BuyerOrders")
+  sellerOrders              Order[]                    @relation("SellerOrders")
+  disputesOpened            Dispute[]                  @relation("DisputeOpener")
+  reviewsWritten            Review[]                   @relation("Reviewer")
+  reviewsReceived           Review[]                   @relation("Reviewee")
+  curatedAuctions           Auction[]                  @relation("AuctionCurator")
+  currentBids               AuctionLot[]               @relation("CurrentBidder")
+  bids                      Bid[]
+  autoBidConfigs            AutoBidConfig[]
+  catalogueProgress         CatalogueProgress[]
+  articles                  Article[]
+  spotlights                CollectorSpotlight[]
+  posts                     Post[]
+  comments                  Comment[]
+  followers                 Follow[]                   @relation("Following")
+  following                 Follow[]                   @relation("Follower")
+  eventsCreated             Event[]
+  eventParticipations       EventParticipant[]
+  activities                Activity[]
+  notifications             Notification[]
+  badges                    UserBadge[]
+  xp                        UserXP?
+  xpTransactions            XPTransaction[]
+  fraudSignals              FraudSignal[]              @relation("FraudUser")
+  verifiedPriceSubmissions  CommunityPriceSubmission[] @relation("PriceVerifier")
+  gradingReviews            GradingResult[]            @relation("GradingReviewer")
+  resolvedFraudSignals      FraudSignal[]              @relation("FraudResolver")
 
   @@index([clerkId])
   @@index([username])
@@ -290,21 +290,21 @@ model Series {
 // ---------------------------------------------------------------------------
 
 model Item {
-  id                 String       @id @default(cuid())
-  categoryId         String
-  name               String
-  description        String?
-  year               Int?
-  manufacturer       String?
-  modelNumber        String?
-  barcode            String?
-  attributes         Json         @default("{}")
-  rarityRating       RarityRating
+  id                  String       @id @default(cuid())
+  categoryId          String
+  name                String
+  description         String?
+  year                Int?
+  manufacturer        String?
+  modelNumber         String?
+  barcode             String?
+  attributes          Json         @default("{}")
+  rarityRating        RarityRating
   estimatedValueCents Int?
-  currency           Currency     @default(EUR)
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  deletedAt          DateTime?
+  currency            Currency     @default(EUR)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  deletedAt           DateTime?
 
   category                  Category                   @relation(fields: [categoryId], references: [id])
   variants                  ItemVariant[]
@@ -316,6 +316,7 @@ model Item {
   gradingSessions           GradingSession[]
   listings                  Listing[]
   catalogueSlots            CatalogueSlot[]
+  marketValues              MarketValue[]
 
   @@index([categoryId])
   @@index([rarityRating])
@@ -341,6 +342,7 @@ model ItemVariant {
   collectionItems CollectionItem[]
   priceRecords    PriceRecord[]
   listings        Listing[]
+  marketValues    MarketValue[]
 
   @@index([itemId])
   @@index([deletedAt])
@@ -411,21 +413,21 @@ model Collection {
 // ---------------------------------------------------------------------------
 
 model CollectionItem {
-  id                String         @id @default(cuid())
-  collectionId      String
-  itemId            String
-  variantId         String?
-  quantity          Int            @default(1)
-  condition         ItemCondition?
+  id                 String         @id @default(cuid())
+  collectionId       String
+  itemId             String
+  variantId          String?
+  quantity           Int            @default(1)
+  condition          ItemCondition?
   purchasePriceCents Int?
-  purchaseCurrency  Currency?
-  purchaseDate      DateTime?
-  notes             String?
-  isWishlist        Boolean        @default(false)
-  gradingResultId   String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  deletedAt         DateTime?
+  purchaseCurrency   Currency?
+  purchaseDate       DateTime?
+  notes              String?
+  isWishlist         Boolean        @default(false)
+  gradingResultId    String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  deletedAt          DateTime?
 
   collection    Collection     @relation(fields: [collectionId], references: [id])
   item          Item           @relation(fields: [itemId], references: [id])
@@ -445,7 +447,7 @@ model CollectionItem {
 // ---------------------------------------------------------------------------
 
 model PriceRecord {
-  id         String       @id @default(cuid())
+  id         String         @id @default(cuid())
   itemId     String
   variantId  String?
   priceCents Int
@@ -453,7 +455,7 @@ model PriceRecord {
   source     PriceSource
   condition  ItemCondition?
   recordedAt DateTime
-  createdAt  DateTime     @default(now())
+  createdAt  DateTime       @default(now())
 
   item    Item         @relation(fields: [itemId], references: [id])
   variant ItemVariant? @relation(fields: [variantId], references: [id])
@@ -462,6 +464,34 @@ model PriceRecord {
   @@index([variantId])
   @@index([itemId, recordedAt])
   @@index([source])
+}
+
+// ---------------------------------------------------------------------------
+// 10b. MarketValue (computed price aggregation)
+// ---------------------------------------------------------------------------
+
+model MarketValue {
+  id               String         @id @default(cuid())
+  itemId           String
+  variantId        String?
+  condition        ItemCondition?
+  avgPriceCents    Int
+  medianPriceCents Int
+  minPriceCents    Int
+  maxPriceCents    Int
+  trendDirection   String         @default("STABLE")
+  trendPercentage  Float          @default(0)
+  sampleSize       Int            @default(0)
+  currency         Currency       @default(EUR)
+  calculatedAt     DateTime       @default(now())
+
+  item    Item         @relation(fields: [itemId], references: [id])
+  variant ItemVariant? @relation(fields: [variantId], references: [id])
+
+  @@index([itemId])
+  @@index([variantId])
+  @@index([trendDirection])
+  @@index([calculatedAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -536,21 +566,21 @@ model GradingImage {
 // ---------------------------------------------------------------------------
 
 model GradingResult {
-  id                   String              @id @default(cuid())
-  sessionId            String              @unique
-  carBodyGrade         Decimal
-  carBodyLetter        String
-  packagingGrade       Decimal?
-  packagingLetter      String?
-  confidence           Float
-  defects              Json
-  modelVersion         String
-  processingTimeMs     Int
-  needsManualReview    Boolean             @default(false)
-  reviewStatus         GradingReviewStatus?
-  reviewerId           String?
+  id                    String               @id @default(cuid())
+  sessionId             String               @unique
+  carBodyGrade          Decimal
+  carBodyLetter         String
+  packagingGrade        Decimal?
+  packagingLetter       String?
+  confidence            Float
+  defects               Json
+  modelVersion          String
+  processingTimeMs      Int
+  needsManualReview     Boolean              @default(false)
+  reviewStatus          GradingReviewStatus?
+  reviewerId            String?
   reviewerGradeOverride Json?
-  createdAt            DateTime            @default(now())
+  createdAt             DateTime             @default(now())
 
   session         GradingSession    @relation(fields: [sessionId], references: [id])
   reviewer        User?             @relation("GradingReviewer", fields: [reviewerId], references: [id])
@@ -592,6 +622,7 @@ model Listing {
   variantId       String?
   type            ListingType
   status          ListingStatus @default(DRAFT)
+  title           String
   priceCents      Int
   currency        Currency
   condition       ItemCondition
@@ -604,9 +635,10 @@ model Listing {
   updatedAt       DateTime      @updatedAt
   deletedAt       DateTime?
 
-  seller      User         @relation(fields: [sellerId], references: [id])
-  item        Item         @relation(fields: [itemId], references: [id])
-  variant     ItemVariant? @relation(fields: [variantId], references: [id])
+  seller       User           @relation(fields: [sellerId], references: [id])
+  item         Item           @relation(fields: [itemId], references: [id])
+  variant      ItemVariant?   @relation(fields: [variantId], references: [id])
+  images       ListingImage[]
   offers       Offer[]
   orders       Order[]
   auctionLots  AuctionLot[]
@@ -618,6 +650,18 @@ model Listing {
   @@index([status])
   @@index([type, status])
   @@index([deletedAt])
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id])
+
+  @@index([listingId])
 }
 
 // ---------------------------------------------------------------------------
@@ -671,13 +715,13 @@ model Order {
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 
-  buyer    User      @relation("BuyerOrders", fields: [buyerId], references: [id])
-  seller   User      @relation("SellerOrders", fields: [sellerId], references: [id])
-  listing  Listing   @relation(fields: [listingId], references: [id])
-  offer    Offer?    @relation(fields: [offerId], references: [id])
-  shipment Shipment?
-  disputes Dispute[]
-  reviews  Review[]
+  buyer        User          @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller       User          @relation("SellerOrders", fields: [sellerId], references: [id])
+  listing      Listing       @relation(fields: [listingId], references: [id])
+  offer        Offer?        @relation(fields: [offerId], references: [id])
+  shipment     Shipment?
+  disputes     Dispute[]
+  reviews      Review[]
   fraudSignals FraudSignal[]
 
   @@index([buyerId])
@@ -791,23 +835,23 @@ model Auction {
 // ---------------------------------------------------------------------------
 
 model AuctionLot {
-  id                String  @id @default(cuid())
-  auctionId         String
-  listingId         String
-  lotNumber         Int
+  id                 String   @id @default(cuid())
+  auctionId          String
+  listingId          String
+  lotNumber          Int
   startingPriceCents Int
-  reservePriceCents Int?
-  currentBidCents   Int     @default(0)
-  currentBidderId   String?
-  bidCount          Int     @default(0)
-  extendsOnBid      Boolean @default(true)
-  extensionSeconds  Int     @default(30)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  reservePriceCents  Int?
+  currentBidCents    Int      @default(0)
+  currentBidderId    String?
+  bidCount           Int      @default(0)
+  extendsOnBid       Boolean  @default(true)
+  extensionSeconds   Int      @default(30)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  auction        Auction        @relation(fields: [auctionId], references: [id])
-  listing        Listing        @relation(fields: [listingId], references: [id])
-  currentBidder  User?          @relation("CurrentBidder", fields: [currentBidderId], references: [id])
+  auction        Auction         @relation(fields: [auctionId], references: [id])
+  listing        Listing         @relation(fields: [listingId], references: [id])
+  currentBidder  User?           @relation("CurrentBidder", fields: [currentBidderId], references: [id])
   bids           Bid[]
   autoBidConfigs AutoBidConfig[]
 
@@ -821,13 +865,13 @@ model AuctionLot {
 // ---------------------------------------------------------------------------
 
 model Bid {
-  id         String   @id @default(cuid())
-  lotId      String
-  bidderId   String
+  id          String   @id @default(cuid())
+  lotId       String
+  bidderId    String
   amountCents Int
-  currency   Currency
-  isAutoBid  Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  currency    Currency
+  isAutoBid   Boolean  @default(false)
+  createdAt   DateTime @default(now())
 
   lot    AuctionLot @relation(fields: [lotId], references: [id])
   bidder User       @relation(fields: [bidderId], references: [id])
@@ -934,6 +978,7 @@ model Article {
   authorId      String
   status        ArticleStatus @default(DRAFT)
   locale        Locale
+  isFeatured    Boolean       @default(false)
   publishedAt   DateTime?
   categoryId    String?
   createdAt     DateTime      @default(now())
@@ -1237,10 +1282,10 @@ model FraudSignal {
   resolvedById String?
   createdAt    DateTime      @default(now())
 
-  user       User?  @relation("FraudUser", fields: [userId], references: [id])
+  user       User?    @relation("FraudUser", fields: [userId], references: [id])
   listing    Listing? @relation(fields: [listingId], references: [id])
-  order      Order? @relation(fields: [orderId], references: [id])
-  resolvedBy User?  @relation("FraudResolver", fields: [resolvedById], references: [id])
+  order      Order?   @relation(fields: [orderId], references: [id])
+  resolvedBy User?    @relation("FraudResolver", fields: [resolvedById], references: [id])
 
   @@index([userId])
   @@index([listingId])

@@ -4,7 +4,7 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^db:generate"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "dev": {
@@ -24,7 +24,8 @@
       "cache": false
     },
     "db:generate": {
-      "cache": false
+      "inputs": ["prisma/schema.prisma"],
+      "outputs": ["../../node_modules/.prisma/client/**"]
     },
     "db:push": {
       "cache": false

@@ -1,0 +1,10 @@
+export { itemRouter } from "./item";
+export { collectionRouter } from "./collection";
+export { marketplaceRouter } from "./marketplace";
+export { gradingRouter } from "./grading";
+export { catalogueRouter } from "./catalogue";
+export { communityRouter } from "./community";
+export { userRouter } from "./user";
+export { auctionRouter } from "./auction";
+export { priceGuideRouter } from "./priceGuide";
+export { editorialRouter } from "./editorial";
