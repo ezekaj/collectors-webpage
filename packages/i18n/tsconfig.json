@@ -1,0 +1,9 @@
+{
+  "extends": "@sammelfieber/config/typescript/library.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "resolveJsonModule": true
+  },
+  "include": ["src", "messages"]
+}

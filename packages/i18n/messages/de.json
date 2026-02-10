@@ -1,0 +1,141 @@
+{
+  "common": {
+    "appName": "Sammelfieber",
+    "tagline": "Die ultimative Plattform fuer Sammler",
+    "search": "Suchen",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden",
+    "settings": "Einstellungen",
+    "profile": "Profil",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Loeschen",
+    "edit": "Bearbeiten",
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten",
+    "noResults": "Keine Ergebnisse gefunden",
+    "viewAll": "Alle anzeigen",
+    "back": "Zurueck",
+    "next": "Weiter",
+    "previous": "Zurueck"
+  },
+  "nav": {
+    "home": "Startseite",
+    "marketplace": "Marktplatz",
+    "auctions": "Auktionen",
+    "priceGuide": "Preisfuehrer",
+    "collection": "Meine Sammlung",
+    "catalogue": "Katalog",
+    "grade": "KI-Bewertung",
+    "editorial": "Magazin",
+    "community": "Community",
+    "events": "Veranstaltungen",
+    "wanted": "Gesucht",
+    "showcases": "Vitrinen"
+  },
+  "home": {
+    "hero": {
+      "title": "Deine Sammlung. Dein Universum.",
+      "subtitle": "Entdecke, bewerte und handle Sammlerstuecke mit KI-gestuetzter Zustandsbewertung"
+    },
+    "editorsPicks": "Redaktionsempfehlungen",
+    "trending": "Im Trend",
+    "latestArticles": "Neueste Artikel",
+    "featuredCollector": "Sammler im Spotlight"
+  },
+  "marketplace": {
+    "title": "Marktplatz",
+    "buyNow": "Jetzt kaufen",
+    "makeOffer": "Angebot machen",
+    "listItem": "Artikel einstellen",
+    "condition": "Zustand",
+    "price": "Preis",
+    "shipping": "Versand",
+    "shipsFrom": "Versand aus",
+    "shipsTo": "Versand nach",
+    "sold": "Verkauft",
+    "filters": "Filter",
+    "sortBy": "Sortieren nach"
+  },
+  "collection": {
+    "title": "Meine Sammlung",
+    "wishlist": "Wunschliste",
+    "totalValue": "Gesamtwert",
+    "itemCount": "Artikel",
+    "addItem": "Artikel hinzufuegen",
+    "valueOverTime": "Wertentwicklung"
+  },
+  "grading": {
+    "title": "KI-Zustandsbewertung",
+    "startGrading": "Bewertung starten",
+    "captureTop": "Draufsicht aufnehmen",
+    "captureLeft": "Linke Seite aufnehmen",
+    "captureBottom": "Unterseite aufnehmen",
+    "captureCardFront": "Kartenvorderseite aufnehmen",
+    "captureCardBack": "Kartenrueckseite aufnehmen",
+    "placeSurface": "Stellen Sie das Auto auf eine helle, ebene Flaeche",
+    "analyzing": "Wird analysiert...",
+    "result": "Bewertungsergebnis",
+    "confidence": "Vertrauen",
+    "defects": "Maengel",
+    "aiGraded": "KI-bewertet",
+    "expertVerified": "Experte verifiziert",
+    "carGrade": "Fahrzeugzustand",
+    "packagingGrade": "Verpackungszustand"
+  },
+  "catalogue": {
+    "title": "Sammelkatalog",
+    "progress": "Fortschritt",
+    "scan": "Scannen",
+    "collected": "Gesammelt",
+    "missing": "Fehlend",
+    "complete": "Komplett!",
+    "nextEmpty": "Naechster leerer Platz"
+  },
+  "auction": {
+    "title": "Auktionen",
+    "live": "LIVE",
+    "upcoming": "Naechste Auktionen",
+    "currentBid": "Aktuelles Gebot",
+    "placeBid": "Gebot abgeben",
+    "autoBid": "Automatisch bieten",
+    "maxBid": "Maximalgebot",
+    "timeLeft": "Verbleibende Zeit",
+    "reserve": "Mindestpreis",
+    "reserveMet": "Mindestpreis erreicht",
+    "reserveNotMet": "Mindestpreis nicht erreicht",
+    "won": "Gewonnen!",
+    "outbid": "Ueberboten"
+  },
+  "priceGuide": {
+    "title": "Preisfuehrer",
+    "marketValue": "Marktwert",
+    "trend": "Trend",
+    "priceHistory": "Preisverlauf",
+    "comparableSales": "Vergleichbare Verkaeufe",
+    "submitPrice": "Preis melden",
+    "source": "Quelle",
+    "lastUpdated": "Zuletzt aktualisiert"
+  },
+  "conditions": {
+    "GEM_MINT": "Makellos",
+    "MINT": "Neuwertig",
+    "NEAR_MINT_MINT": "Fast Neuwertig/Neuwertig",
+    "NEAR_MINT": "Fast Neuwertig",
+    "EXCELLENT": "Ausgezeichnet",
+    "VERY_GOOD": "Sehr Gut",
+    "GOOD": "Gut",
+    "FAIR": "Befriedigend",
+    "POOR": "Mangelhaft"
+  },
+  "rarity": {
+    "COMMON": "Gewoehnlich",
+    "UNCOMMON": "Ungewoehnlich",
+    "RARE": "Selten",
+    "VERY_RARE": "Sehr Selten",
+    "ULTRA_RARE": "Ultra Selten",
+    "CHASE": "Chase",
+    "ONE_OF_ONE": "Einzelstueck"
+  }
+}

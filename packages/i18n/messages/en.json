@@ -1,0 +1,141 @@
+{
+  "common": {
+    "appName": "Sammelfieber",
+    "tagline": "The ultimate platform for collectors",
+    "search": "Search",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "settings": "Settings",
+    "profile": "Profile",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "noResults": "No results found",
+    "viewAll": "View All",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "nav": {
+    "home": "Home",
+    "marketplace": "Marketplace",
+    "auctions": "Auctions",
+    "priceGuide": "Price Guide",
+    "collection": "My Collection",
+    "catalogue": "Catalogue",
+    "grade": "AI Grading",
+    "editorial": "Magazine",
+    "community": "Community",
+    "events": "Events",
+    "wanted": "Wanted",
+    "showcases": "Showcases"
+  },
+  "home": {
+    "hero": {
+      "title": "Your Collection. Your Universe.",
+      "subtitle": "Discover, grade and trade collectibles with AI-powered condition assessment"
+    },
+    "editorsPicks": "Editor's Picks",
+    "trending": "Trending Now",
+    "latestArticles": "Latest Articles",
+    "featuredCollector": "Collector Spotlight"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "buyNow": "Buy Now",
+    "makeOffer": "Make Offer",
+    "listItem": "List Item",
+    "condition": "Condition",
+    "price": "Price",
+    "shipping": "Shipping",
+    "shipsFrom": "Ships From",
+    "shipsTo": "Ships To",
+    "sold": "Sold",
+    "filters": "Filters",
+    "sortBy": "Sort By"
+  },
+  "collection": {
+    "title": "My Collection",
+    "wishlist": "Wishlist",
+    "totalValue": "Total Value",
+    "itemCount": "Items",
+    "addItem": "Add Item",
+    "valueOverTime": "Value Over Time"
+  },
+  "grading": {
+    "title": "AI Condition Grading",
+    "startGrading": "Start Grading",
+    "captureTop": "Capture Top View",
+    "captureLeft": "Capture Left Side",
+    "captureBottom": "Capture Bottom",
+    "captureCardFront": "Capture Card Front",
+    "captureCardBack": "Capture Card Back",
+    "placeSurface": "Place the car on a plain, light-colored surface",
+    "analyzing": "Analyzing...",
+    "result": "Grading Result",
+    "confidence": "Confidence",
+    "defects": "Defects",
+    "aiGraded": "AI Graded",
+    "expertVerified": "Expert Verified",
+    "carGrade": "Car Grade",
+    "packagingGrade": "Packaging Grade"
+  },
+  "catalogue": {
+    "title": "Collection Catalogue",
+    "progress": "Progress",
+    "scan": "Scan",
+    "collected": "Collected",
+    "missing": "Missing",
+    "complete": "Complete!",
+    "nextEmpty": "Next Empty Slot"
+  },
+  "auction": {
+    "title": "Auctions",
+    "live": "LIVE",
+    "upcoming": "Upcoming Auctions",
+    "currentBid": "Current Bid",
+    "placeBid": "Place Bid",
+    "autoBid": "Auto Bid",
+    "maxBid": "Max Bid",
+    "timeLeft": "Time Left",
+    "reserve": "Reserve",
+    "reserveMet": "Reserve Met",
+    "reserveNotMet": "Reserve Not Met",
+    "won": "Won!",
+    "outbid": "Outbid"
+  },
+  "priceGuide": {
+    "title": "Price Guide",
+    "marketValue": "Market Value",
+    "trend": "Trend",
+    "priceHistory": "Price History",
+    "comparableSales": "Comparable Sales",
+    "submitPrice": "Submit Price",
+    "source": "Source",
+    "lastUpdated": "Last Updated"
+  },
+  "conditions": {
+    "GEM_MINT": "Gem Mint",
+    "MINT": "Mint",
+    "NEAR_MINT_MINT": "Near Mint/Mint",
+    "NEAR_MINT": "Near Mint",
+    "EXCELLENT": "Excellent",
+    "VERY_GOOD": "Very Good",
+    "GOOD": "Good",
+    "FAIR": "Fair",
+    "POOR": "Poor"
+  },
+  "rarity": {
+    "COMMON": "Common",
+    "UNCOMMON": "Uncommon",
+    "RARE": "Rare",
+    "VERY_RARE": "Very Rare",
+    "ULTRA_RARE": "Ultra Rare",
+    "CHASE": "Chase",
+    "ONE_OF_ONE": "One of One"
+  }
+}
